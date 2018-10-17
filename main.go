@@ -498,86 +498,7 @@ func main() {
 
 	// collect outputs
 
-	var ipas, dsyms, apps []string
-	iosOutputDir := filepath.Join(workDir, "platforms", "ios", "build", configs.Target)
-	if exist, err := pathutil.IsDirExists(iosOutputDir); err != nil {
-		fail("Failed to check if dir (%s) exist, error: %s", iosOutputDir, err)
-	} else if exist {
-		log.Donef("\n\nIOS output dir exists!\n\n")
-
-		fmt.Println()
-		log.Infof("Collecting ios outputs")
-
-		// ipa
-		ipas, err = findArtifact(iosOutputDir, "ipa", buildStart)
-		if err != nil {
-			fail("Failed to find ipas in dir (%s), error: %s", iosOutputDir, err)
-		}
-
-		if len(ipas) > 0 {
-			if exportedPth, _, err := moveAndExportOutputs(ipas, configs.DeployDir, ipaPathEnvKey, apkPathListEnvKey); err != nil {
-				fail("Failed to export ipas, error: %s", err)
-			} else if exportedPth != "" {
-				log.Donef("The ipa path is now available in the Environment Variable: %s (value: %s)", ipaPathEnvKey, exportedPth)
-			}
-		}
-		// ---
-
-		// dsym
-		dsyms, err = findArtifact(iosOutputDir, "dSYM", buildStart)
-		if err != nil {
-			fail("Failed to find dSYMs in dir (%s), error: %s", iosOutputDir, err)
-		}
-
-		if len(dsyms) > 0 {
-			if exportedPth, _, err := moveAndExportOutputs(dsyms, configs.DeployDir, dsymDirPathEnvKey, apkPathListEnvKey); err != nil {
-				fail("Failed to export dsyms, error: %s", err)
-			} else if exportedPth != "" {
-				log.Donef("The dsym dir path is now available in the Environment Variable: %s (value: %s)", dsymDirPathEnvKey, exportedPth)
-
-				zippedExportedPth := exportedPth + ".zip"
-				if err := ziputil.ZipDir(exportedPth, zippedExportedPth, false); err != nil {
-					fail("Failed to zip dsym dir (%s), error: %s", exportedPth, err)
-				}
-
-				if err := tools.ExportEnvironmentWithEnvman(dsymZipPathEnvKey, zippedExportedPth); err != nil {
-					fail("Failed to export dsym.zip (%s), error: %s", zippedExportedPth, err)
-				}
-
-				log.Donef("The dsym.zip path is now available in the Environment Variable: %s (value: %s)", dsymZipPathEnvKey, zippedExportedPth)
-			}
-		}
-		// --
-
-		// app
-		apps, err = findArtifact(iosOutputDir, "app", buildStart)
-		if err != nil {
-			fail("Failed to find apps in dir (%s), error: %s", iosOutputDir, err)
-		}
-
-		if len(apps) > 0 {
-			if exportedPth, _, err := moveAndExportOutputs(apps, configs.DeployDir, appDirPathEnvKey, apkPathListEnvKey); err != nil {
-				log.Warnf("Failed to export apps, error: %s", err)
-			} else if exportedPth != "" {
-				log.Donef("The app dir path is now available in the Environment Variable: %s (value: %s)", appDirPathEnvKey, exportedPth)
-
-				zippedExportedPth := exportedPth + ".zip"
-				if err := ziputil.ZipDir(exportedPth, zippedExportedPth, false); err != nil {
-					fail("Failed to zip app dir (%s), error: %s", exportedPth, err)
-				}
-
-				if err := tools.ExportEnvironmentWithEnvman(appZipPathEnvKey, zippedExportedPth); err != nil {
-					fail("Failed to export app.zip (%s), error: %s", zippedExportedPth, err)
-				}
-
-				log.Donef("The app.zip path is now available in the Environment Variable: %s (value: %s)", appZipPathEnvKey, zippedExportedPth)
-			}
-		}
-		// ---
-	} else {
-		// ios output directory not exists and ios selected as platform
-	}
-
+	
 	var apks []string
 	androidOutputDir := filepath.Join(workDir, "platforms", "android")
 	if exist, err := pathutil.IsDirExists(androidOutputDir); err != nil {
@@ -607,13 +528,5 @@ func main() {
 	if len(apks) == 0 && sliceutil.IsStringInSlice("android", platforms) {
 		fail("No apk generated")
 	}
-	// if ios in platforms
-	if sliceutil.IsStringInSlice("ios", platforms) {
-		if len(apps) == 0 && configs.Target == "emulator" {
-			fail("no apps generated")
-		}
-		if len(ipas) == 0 && configs.Target == "device" {
-			fail("no ipas generated")
-		}
-	}
+
 }
