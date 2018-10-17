@@ -467,6 +467,8 @@ func main() {
 
 			cmdArgs = append(cmdArgs, "build")
 
+			cmdArgs = append(cmdArgs, platform)
+
 			if configs.Configuration != "" {
 				cmdArgs = append(cmdArgs, "--"+configs.Configuration)
 			}
@@ -474,8 +476,6 @@ func main() {
 			if configs.Target != "" {
 				cmdArgs = append(cmdArgs, "--"+configs.Target)
 			}
-
-			cmdArgs = append(cmdArgs, platform)
 
 			if configs.BuildConfig != "" {
 				cmdArgs = append(cmdArgs, "--buildConfig", configs.BuildConfig)
