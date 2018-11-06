@@ -436,7 +436,7 @@ func main() {
 			}
 
 			cmdArgs = append(cmdArgs, platformVersion)
-			cmdArgs = append(cmdArgs, " --verbose")
+			cmdArgs = append(cmdArgs, "--verbose")
 
 			cmd := command.New(cmdArgs[0], cmdArgs[1:]...)
 			cmd.SetStdout(os.Stdout).SetStderr(os.Stderr).SetStdin(strings.NewReader("y"))
