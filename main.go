@@ -437,7 +437,7 @@ func main() {
 
 			cmdArgs = append(cmdArgs, platformVersion)
 
-			cmd := command.New(cmdArgs[0], cmdArgs[1:]...)
+			cmd := command.New(cmdArgs[0], cmdArgs[1:]..., " --verbose")
 			cmd.SetStdout(os.Stdout).SetStderr(os.Stderr).SetStdin(strings.NewReader("y"))
 
 			log.Donef("$ %s", cmd.PrintableCommandArgs())
@@ -467,6 +467,7 @@ func main() {
 			}
 
 			cmdArgs = append(cmdArgs, "build")
+			cmdArgs = append(cmdArgs, platform)
 
 			if configs.Configuration != "" {
 				cmdArgs = append(cmdArgs, "--"+configs.Configuration)
@@ -475,8 +476,6 @@ func main() {
 			if configs.Target != "" {
 				cmdArgs = append(cmdArgs, "--"+configs.Target)
 			}
-
-			cmdArgs = append(cmdArgs, platform)
 
 			if configs.BuildConfig != "" {
 				cmdArgs = append(cmdArgs, "--buildConfig", configs.BuildConfig)
